@@ -1,11 +1,18 @@
 import tweepy
 import os
-import time
+from datetime import date, datetime
+from datetime import timedelta
+from json import dumps
 
-# Authenticate to Twitter using the credentials stored in environment variables
-auth = tweepy.OAuthHandler(os.environ['TWITTER_API_KEY'], os.environ['TWITTER_API_SECRET_KEY'])
-auth.set_access_token(os.environ['TWITTER_ACCESS_TOKEN'], os.environ['TWITTER_ACCESS_TOKEN_SECRET'])
-api = tweepy.API(auth)
+consumer_key = os.environ['TWITTER_API_KEY']
+consumer_secret = os.environ['TWITTER_API_SECRET_KEY']
+access_token = os.environ['TWITTER_ACCESS_TOKEN']
+access_token_secret = os.environ['TWITTER_ACCESS_TOKEN_SECRET']
+
+client = tweepy.Client(consumer_key=consumer_key,
+                    consumer_secret=consumer_secret,
+                    access_token=access_token,
+                    access_token_secret=access_token_secret)
 
 # Folder containing the frames in the repository
 frames_folder = 'frames'
