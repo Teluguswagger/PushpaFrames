@@ -1,9 +1,8 @@
 import tweepy
 import os
-from datetime import date, datetime
-from datetime import timedelta
-from json import dumps
+import re
 
+# Twitter API authentication
 consumer_key = os.environ['TWITTER_API_KEY']
 consumer_secret = os.environ['TWITTER_API_SECRET_KEY']
 access_token = os.environ['TWITTER_ACCESS_TOKEN']
@@ -17,8 +16,13 @@ client = tweepy.Client(consumer_key=consumer_key,
 # Folder containing the frames in the repository
 frames_folder = 'frames'
 
-# List all image files from the frames folder
-frames = sorted(os.listdir(frames_folder))
+# Function to extract the numerical part of the filename
+def get_frame_number(filename):
+    match = re.search(r'(\d+)', filename)
+    return int(match.group()) if match else 0
+
+# List and sort all image files based on their numeric part
+frames = sorted(os.listdir(frames_folder), key=get_frame_number)
 
 # Read the current frame index from a file
 try:
@@ -37,7 +41,7 @@ if current_frame < total_frames:
 
     try:
         # Post the tweet with the image
-        api.update_status_with_media(status=tweet_text, filename=frame_filename)
+        client.create_tweet(text=tweet_text)
         print(f"Posted: {tweet_text}")
         
         # Increment the frame index
