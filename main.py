@@ -40,9 +40,11 @@ if current_frame < total_frames:
     tweet_text = f"#Pushpa2Teaser - Frame {current_frame + 1} of {total_frames}"
 
     try:
+        # Upload the image
+        media = client.media_upload(frame_filename)
         # Post the tweet with the image
-        client.create_tweet(text=tweet_text)
-        print(f"Posted: {tweet_text}")
+        client.create_tweet(text=tweet_text, media_ids=[media.media_id])
+        print(f"Posted: {tweet_text} with image: {frame_filename}")
         
         # Increment the frame index
         current_frame += 1
