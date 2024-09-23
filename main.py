@@ -19,7 +19,7 @@ auth = tweepy.OAuth1UserHandler(consumer_key, consumer_secret, access_token, acc
 api = tweepy.API(auth)
 
 # Folder containing the frames in the repository
-frames_folder = 'PushpaFrames/Frames'
+frames_folder = 'Frames'
 
 # Function to extract the numerical part of the filename
 def get_frame_number(filename):
