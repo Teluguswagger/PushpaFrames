@@ -8,10 +8,15 @@ consumer_secret = os.environ['TWITTER_API_SECRET_KEY']
 access_token = os.environ['TWITTER_ACCESS_TOKEN']
 access_token_secret = os.environ['TWITTER_ACCESS_TOKEN_SECRET']
 
+# Set up Tweepy v2 client
 client = tweepy.Client(consumer_key=consumer_key,
                     consumer_secret=consumer_secret,
                     access_token=access_token,
                     access_token_secret=access_token_secret)
+
+# Set up Tweepy v1.1 API (required for media upload)
+auth = tweepy.OAuth1UserHandler(consumer_key, consumer_secret, access_token, access_token_secret)
+api = tweepy.API(auth)
 
 # Folder containing the frames in the repository
 frames_folder = 'frames'
@@ -41,11 +46,12 @@ if current_frame < total_frames:
 
     try:
         print(f"Attempting to upload image: {frame_filename}")
-        # Upload the image
-        media = client.media_upload(frame_filename)
+        
+        # Upload the image using Tweepy v1.1
+        media = api.media_upload(frame_filename)
         print("Image uploaded successfully.")
-
-        # Post the tweet with the image
+        
+        # Post the tweet with the image using Tweepy v2
         client.create_tweet(text=tweet_text, media_ids=[media.media_id])
         print(f"Posted: {tweet_text} with image: {frame_filename}")
         
