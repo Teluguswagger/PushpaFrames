@@ -32,3 +32,11 @@ jobs:
         TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
       run: |
         python main.py  # Changed to lowercase 'python'
+
+    - name: Commit updated frame index
+      run: |
+        git config --global user.name "GitHub Actions Bot"
+        git config --global user.email "actions@github.com"
+        git add current_frame.txt
+        git commit -m "Update current frame index"
+        git push
