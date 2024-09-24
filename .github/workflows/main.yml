@@ -27,7 +27,8 @@ jobs:
         git config --global user.email "Tharunteja2u@gmail.com"
         git config --global user.name "Teluguswagger"
         git add current_frame.txt
-        git commit -m "Update current frame"
+        git commit -m "Update current_frame.txt"
+         git push https://x-access-token:${{ secrets.GH_PAT }}@github.com/Teluguswagger/PushpaFrames.git master
         git push origin master
     env:
         TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
