@@ -19,12 +19,13 @@ auth = tweepy.OAuth1UserHandler(consumer_key, consumer_secret, access_token, acc
 api = tweepy.API(auth)
 
 # Folder containing the frames in the repository
-frames_folder = 'frames'
+frames_folder = 'frames' 
 
 # Function to extract the numerical part of the filename
 def get_frame_number(filename):
-    match = re.search(r'(\d+)', filename)
-    return int(match.group()) if match else 0
+    # Extract the digits after "frame_" using regular expressions
+    match = re.search(r'frame_(\d+)\.jpg', filename)
+    return int(match.group(1)) if match else 0
 
 # List and sort all image files based on their numeric part
 frames = sorted(os.listdir(frames_folder), key=get_frame_number)
@@ -71,7 +72,6 @@ try:
     # Update the current frame index in the file
     with open(current_frame_file, 'w') as f:
         f.write(str(current_frame))
-        print(f"Updated {current_frame_file} to {current_frame}")
 
 except Exception as e:
     print(f"Error: {e}")
