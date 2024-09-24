@@ -20,7 +20,7 @@ jobs:
         git config --global user.name "Github Actions"
         git add current_frame.txt
         git commit -m "Current"
-        git push origin main
+        git push origin master
       env:
         TWITTER_API_KEY : ${{ secrets.TWITTER_API_KEY }}
         TWITTER_API_SECRET_KEY : ${{ secrets.TWITTER_API_SECRET_KEY }}
