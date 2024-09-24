@@ -2,7 +2,7 @@ name: Run bot
 
 on:
   schedule:
-    - cron: '* * * * '
+    - cron: '*/5 * * * *'
   push:
     branches: [ master ]
 
