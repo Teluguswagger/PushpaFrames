@@ -31,7 +31,7 @@ jobs:
         git config --global user.name "Github Actions"
         git add current_frame.txt
         git commit -m "Update current_frame.txt"
-        git push --force https://x-access-token:${{ secrets.GH_PAT }}@github.com/Teluguswagger/PushpaFrames.git Head:master 
+        git push --force https://x-access-token:${{ secrets.GH_PAT }}@github.com/Teluguswagger/PushpaFrames.git HEAD:master 
       env:
         TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
         TWITTER_API_SECRET_KEY: ${{ secrets.TWITTER_API_SECRET_KEY }}
