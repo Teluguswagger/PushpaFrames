@@ -1,72 +1,52 @@
 import tweepy
 import os
-import re
+import glob
 
-# Twitter API authentication
-consumer_key = os.environ['TWITTER_API_KEY']
-consumer_secret = os.environ['TWITTER_API_SECRET_KEY']
-access_token = os.environ['TWITTER_ACCESS_TOKEN']
-access_token_secret = os.environ['TWITTER_ACCESS_TOKEN_SECRET']
-
-# Set up Tweepy v2 client
-client = tweepy.Client(consumer_key=consumer_key,
-                       consumer_secret=consumer_secret,
-                       access_token=access_token,
-                       access_token_secret=access_token_secret)
-
-
-auth = tweepy.OAuth1UserHandler(consumer_key, consumer_secret, access_token, access_token_secret)
-api = tweepy.API(auth)
-
-
-frames_folder = 'frames'
-
-# Function to extract the numerical part of the filename
-def get_frame_number(filename):
-    match = re.search(r'(\d+)', filename)
-    return int(match.group()) if match else 0
-
-# List and sort all image files based on their numeric part
-frames = sorted(os.listdir(frames_folder), key=get_frame_number)
-
-
-current_frame_file = 'current_frame.txt'
-
-
-try:
-    with open(current_frame_file, 'r') as f:
-        current_frame = int(f.read().strip())
-except FileNotFoundError:
-    current_frame = 0
-
-
-total_frames = len(frames)
-
-
-if current_frame >= total_frames:
-    current_frame = 0  # Reset to the first frame if we've reached the end
-
-
-frame_filename = os.path.join(frames_folder, frames[current_frame])
-tweet_text = f"#Pushpa2Teaser - Frame {current_frame + 1} of {total_frames}"
-
-try:
-    print(f"Attempting to upload image: {frame_filename}")
-
-    # Upload the image using Tweepy v1.1
-    media = api.media_upload(frame_filename)
-    print("Image uploaded successfully.")
-
+# Authentication to Twitter
+def twitter_auth():
+    API_KEY = os.getenv("TWITTER_API_KEY")
+    API_KEY_SECRET = os.getenv("TWITTER_API_SECRET_KEY")
+    ACCESS_TOKEN = os.getenv("TWITTER_ACCESS_TOKEN")
+    ACCESS_TOKEN_SECRET = os.getenv("TWITTER_ACCESS_TOKEN_SECRET")
     
-    client.create_tweet(text=tweet_text, media_ids=[media.media_id])
-    print(f"Posted: {tweet_text} with image: {frame_filename}")
+    auth = tweepy.OAuthHandler(API_KEY, API_KEY_SECRET)
+    auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
+    
+    return tweepy.API(auth)
 
-   
-    current_frame += 1
+# Post a frame to Twitter
+def post_frame(api, frame_number, total_frames, frame_path):
+    tweet_text = f"#Pushpa2Teaser - Frame {frame_number} of {total_frames}"
+    api.update_status_with_media(status=tweet_text, filename=frame_path)
+    print(f"Posted: {tweet_text}")
 
-  
-    with open(current_frame_file, 'w') as f:
-        f.write(str(current_frame))
+# Main function
+def main():
+    api = twitter_auth()
+    
+    # Get all frame images from the 'frames' directory
+    frames_folder = "frames"
+    frames = sorted(glob.glob(f"{frames_folder}/*.[pjPJ][pnNP][gG]*"))  # Match .jpg, .jpeg, .png, .gif
 
-except Exception as e:
-    print(f"Error: {e}")
+    total_frames = len(frames)
+    
+    # Track the current frame
+    if not os.path.exists("current_frame.txt"):
+        current_frame = 0
+    else:
+        with open("current_frame.txt", "r") as f:
+            current_frame = int(f.read().strip())
+
+    if current_frame < total_frames:
+        frame_path = frames[current_frame]
+        post_frame(api, current_frame + 1, total_frames, frame_path)
+        current_frame += 1
+
+        # Update the current frame tracker
+        with open("current_frame.txt", "w") as f:
+            f.write(str(current_frame))
+    else:
+        print("All frames have been posted.")
+
+if __name__ == "__main__":
+    main()
