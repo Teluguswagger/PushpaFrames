@@ -1,5 +1,5 @@
-import tweepy
 import os
+import tweepy
 import re
 
 # Twitter API authentication
@@ -9,23 +9,24 @@ access_token = os.environ['TWITTER_ACCESS_TOKEN']
 access_token_secret = os.environ['TWITTER_ACCESS_TOKEN_SECRET']
 
 # Set up Tweepy v2 client
-client = tweepy.Client(consumer_key=consumer_key,
-                       consumer_secret=consumer_secret,
-                       access_token=access_token,
-                       access_token_secret=access_token_secret)
+client = tweepy.Client(
+    consumer_key=consumer_key,
+    consumer_secret=consumer_secret,
+    access_token=access_token,
+    access_token_secret=access_token_secret
+)
 
-# Set up Tweepy v1.1 API (required for media upload)
+# Set up Tweepy v1.1 API for media upload
 auth = tweepy.OAuth1UserHandler(consumer_key, consumer_secret, access_token, access_token_secret)
 api = tweepy.API(auth)
 
 # Folder containing the frames in the repository
-frames_folder = 'frames' 
+frames_folder = 'frames'
 
-# Function to extract the numerical part of the filename
+# Function to extract the numerical part of the filename for sorting
 def get_frame_number(filename):
-    # Extract the digits after "frame_" using regular expressions
-    match = re.search(r'frame_(\d+)\.jpg', filename)
-    return int(match.group(1)) if match else 0
+    match = re.search(r'(\d+)', filename)
+    return int(match.group()) if match else 0
 
 # List and sort all image files based on their numeric part
 frames = sorted(os.listdir(frames_folder), key=get_frame_number)
@@ -33,22 +34,23 @@ frames = sorted(os.listdir(frames_folder), key=get_frame_number)
 # File to keep track of the current frame index
 current_frame_file = 'current_frame.txt'
 
-# Read the current frame index from the file
+# Read the current frame index from the file (default to 0 if file is missing)
 try:
     with open(current_frame_file, 'r') as f:
         current_frame = int(f.read().strip())
-except FileNotFoundError:
-    current_frame = 0  # If file is not found, start from the first frame
+except (ValueError, FileNotFoundError):
+    current_frame = 0  # Start from the first frame if the file doesn't exist or is invalid
 
 # Total number of frames
 total_frames = len(frames)
 
-# Ensure the current frame is valid
-if current_frame >= total_frames:
-    current_frame = 0  # Reset to the first frame if we've reached the end
+# Ensure the current frame index is within bounds
+current_frame = current_frame % total_frames
 
-# Post the current frame image to Twitter
+# Get the current frame filename
 frame_filename = os.path.join(frames_folder, frames[current_frame])
+
+# Compose the tweet text
 tweet_text = f"#Pushpa2Teaser - Frame {current_frame + 1} of {total_frames}"
 
 try:
@@ -63,15 +65,11 @@ try:
     print(f"Posted: {tweet_text} with image: {frame_filename}")
 
     # Increment the frame index
-    current_frame += 1
-
-    # Ensure the current frame doesn't exceed the total number of frames
-    if current_frame >= total_frames:
-        current_frame = 0  # Reset to the beginning if all frames are posted
+    next_frame = (current_frame + 1) % total_frames  # Loop back to 0 after the last frame
 
     # Update the current frame index in the file
     with open(current_frame_file, 'w') as f:
-        f.write(str(current_frame))
+        f.write(str(next_frame))
 
 except Exception as e:
     print(f"Error: {e}")
