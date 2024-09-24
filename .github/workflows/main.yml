@@ -4,7 +4,7 @@ on:
   schedule:
     - cron: '*/5 * * * *'  # Runs every 60 minutes
   push:
-    branches: [ master ]  # Trigger on push to main branch
+    branches: [ master ]
 
 jobs:
   build:
@@ -31,9 +31,10 @@ jobs:
         git config --global user.name "Github Actions"
         git add current_frame.txt
         git commit -m "Update current_frame.txt"
-        git push origin master
+        git push https://x-access-token:${{ secrets.GH_PAT }}@github.com/Teluguswagger/PushpaFrames.git master  # Push changes to master branch
       env:
         TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
         TWITTER_API_SECRET_KEY: ${{ secrets.TWITTER_API_SECRET_KEY }}
         TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
         TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+        GH_PAT: ${{ secrets.GH_PAT }}  # Use the PAT stored in GitHub Secrets
