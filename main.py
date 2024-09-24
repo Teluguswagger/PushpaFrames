@@ -12,13 +12,20 @@ def twitter_auth():
     auth = tweepy.OAuthHandler(API_KEY, API_KEY_SECRET)
     auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
     
-    return tweepy.API(auth)
+    return tweepy.API(auth, wait_on_rate_limit=True)
 
-# Post a frame to Twitter
+# Upload media to Twitter and post a frame
 def post_frame(api, frame_number, total_frames, frame_path):
     tweet_text = f"#Pushpa2Teaser - Frame {frame_number} of {total_frames}"
-    api.update_status_with_media(status=tweet_text, filename=frame_path)
-    print(f"Posted: {tweet_text}")
+    
+    # Upload the media first
+    try:
+        media = api.media_upload(frame_path)
+        # Now post the tweet with media ID
+        api.update_status(status=tweet_text, media_ids=[media.media_id])
+        print(f"Posted: {tweet_text}")
+    except tweepy.TweepyException as e:
+        print(f"Failed to post tweet: {e}")
 
 # Main function
 def main():
