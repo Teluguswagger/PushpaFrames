@@ -56,8 +56,8 @@ tweet_text = f"#Pushpa2Teaser - Frame {current_frame + 1} of {total_frames}"
 try:
     print(f"Attempting to upload image: {frame_filename}")
 
-    # Upload the image using Tweepy v1.1
-    media = api.media_upload(frame_filename)
+    # Upload the image using Tweepy v1.1 with media_category for high-quality image
+    media = api.media_upload(frame_filename, media_category='tweet_image')  # Ensure original quality
     print("Image uploaded successfully.")
 
     # Post the tweet with the image using Tweepy v2
